@@ -97,11 +97,9 @@
   <div id="plantuml-output">
     <div class="puml-loading">Loading PlantUML engine…</div>
   </div>
-  <!-- viz-global.js must be loaded as a classic script (it sets globals). -->
-  <script src="vendor/viz-global.js"></script>
   <!--
-    The PlantUML engine (originally a single 25 MB ES module) is split
-    into 7 chunks to stay under Mozilla AMO's 5 MB per-file linter limit.
+    The PlantUML engine (originally a single 14 MB ES module) is split
+    into 4 chunks to stay under Mozilla AMO's 5 MB per-file linter limit.
     The chunks are loaded as classic scripts in order; top-level `let`
     and `const` have been rewritten to `var` by split_plantuml.py so all
     declarations share the same scope across chunks. The final chunk
@@ -111,9 +109,6 @@
   <script src="vendor/plantuml.1.js"></script>
   <script src="vendor/plantuml.2.js"></script>
   <script src="vendor/plantuml.3.js"></script>
-  <script src="vendor/plantuml.4.js"></script>
-  <script src="vendor/plantuml.5.js"></script>
-  <script src="vendor/plantuml.6.js"></script>
   <!-- renderer.js is loaded as a classic script and reads window.__plantuml. -->
   <script src="renderer.js"></script>
 </body>

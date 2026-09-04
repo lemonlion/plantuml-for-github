@@ -22,7 +22,7 @@ store's submission stays simple.
 
 Mozilla's AMO linter (`addons-linter`) refuses to parse JavaScript
 files larger than 5 MB. Our TeaVM-compiled `vendor/plantuml.js` weighs
-about 24 MB (non-minified, kept readable for AMO reviewers), so a
+about 14 MB (non-minified, kept readable for AMO reviewers), so a
 naive submission is rejected at upload time with the error
 `File is too large to parse`.
 
@@ -55,8 +55,8 @@ All commands are run from the repository root.
 python split_plantuml.py
 ```
 
-This reads `vendor/plantuml.js` and produces seven files in the same
-directory: `plantuml.0.js` through `plantuml.6.js`, each about 3.9 MB.
+This reads `vendor/plantuml.js` and produces four files in the same
+directory: `plantuml.0.js` through `plantuml.3.js`, each under 4 MB.
 The script reports the size of every chunk and warns if any exceeds
 the 4 MB target.
 
@@ -91,14 +91,14 @@ root, where `<version>` is read from `manifest.json`. The script:
 
 - Includes only the files needed at runtime (`manifest.json`,
   `content.js`, `renderer.html`, `renderer.js`, `LICENSE`, the icons,
-  the seven engine chunks, and `viz-global.js`).
+  and the four engine chunks).
 - Explicitly excludes `vendor/plantuml.js` (the unchunked original),
   `vendor/plantuml.js.gz` (a leftover from earlier experiments), and
   `vendor/plantuml.filtered.js` (an analysis artifact).
 - Uses forward slashes in all archive paths (PowerShell's
   `Compress-Archive` writes backslashes on some Windows builds, which
   AMO rejects with `Invalid file name in archive`).
-- Refuses to write the archive if any of the seven chunks is missing
+- Refuses to write the archive if any of the four chunks is missing
   or if any included JS file exceeds 5 MB.
 
 A successful run ends with
@@ -132,22 +132,31 @@ containing the entire repository at the tagged commit, including:
 - `split_plantuml.py` and `build_zip.py` from this repository.
 - A `BUILD.md` or this `FIREFOX.md` file with the exact commands.
 
+The current `vendor/plantuml.js` is built from plantuml/plantuml
+commit `0e4f452` (a 1.2026.8beta1 snapshot) with:
+
+```
+gradlew :plantuml-mit:npmPackage -Pci
+```
+
+with `obfuscated.set(false)` in `plantuml-mit/build.gradle.kts` so the
+output stays readable for AMO review (the Chrome build uses the same
+command with the default `obfuscated.set(true)`). The engine file is
+`plantuml-mit/build/npm-plantuml/plantuml.js`.
+
 A reviewer should be able to run `python split_plantuml.py` followed
 by `python build_zip.py` on a fresh checkout and end up with a byte-
 for-byte identical ZIP (modulo timestamps).
 
 ## Known validator warnings
 
-The AMO automated linter reports five warnings on every build. All
-are benign and should not block review:
+The AMO automated linter reports seven warnings and zero errors on
+the current build (verified by running `addons-linter` on the 0.3.0
+ZIP). All are benign and should not block review:
 
-- **`Unsafe assignment to innerHTML` (x3 in `content.js`)** —
+- **`Unsafe assignment to innerHTML` (x6 in `content.js`)** —
   the assignments use static SVG icon strings and constant empty
   strings, never user-controlled data.
-- **`Error in no-unsanitized: Unexpected Callee` in
-  `vendor/viz-global.js`** — an internal linter bug triggered by
-  minified code patterns it does not recognize; reported upstream by
-  others.
 - **`Manifest key not supported by the specified minimum Firefox for
   Android version`** — cosmetic. The extension is desktop-only and
   does not declare `gecko_android`; the linter still cross-checks
@@ -162,9 +171,9 @@ note" to save the reviewer time.
 | File | Role |
 |---|---|
 | `manifest.json` | Adds `browser_specific_settings.gecko` for Firefox |
-| `renderer.html` | Loads the seven engine chunks before `renderer.js` |
+| `renderer.html` | Loads the four engine chunks before `renderer.js` |
 | `renderer.js` | Reads the API from `window.__plantuml` synchronously |
-| `vendor/plantuml.0.js` ... `plantuml.6.js` | The pre-split engine |
+| `vendor/plantuml.0.js` ... `plantuml.3.js` | The pre-split engine |
 | `split_plantuml.py` | Produces the chunks from `vendor/plantuml.js` |
 | `build_zip.py` | Packages the extension into a Firefox-ready ZIP |
 | `FIREFOX.md` | This file |

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PlantUML for GitHub",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Renders plantuml code blocks directly on GitHub pages using the client-side TeaVM-compiled PlantUML engine.",
   "author": "Arnaud Roques",
   "homepage_url": "https://github.com/plantuml/plantuml",
@@ -32,10 +32,6 @@
     }
   ],
 
-  "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
-  },
-
   "web_accessible_resources": [
     {
       "resources": [
@@ -44,11 +40,7 @@
         "vendor/plantuml.0.js",
         "vendor/plantuml.1.js",
         "vendor/plantuml.2.js",
-        "vendor/plantuml.3.js",
-        "vendor/plantuml.4.js",
-        "vendor/plantuml.5.js",
-        "vendor/plantuml.6.js",
-        "vendor/viz-global.js"
+        "vendor/plantuml.3.js"
       ],
       "matches": ["https://github.com/*"]
     }
