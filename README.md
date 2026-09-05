@@ -37,27 +37,18 @@ The extension declares **zero Chrome permissions** (no host permissions, no
 storage, no tabs API). It only ships a content script scoped to `github.com`
 and a packaged renderer page.
 
-One thing worth calling out is the extension's Content Security Policy. The
-Manifest V3 default CSP for extension pages is essentially `script-src 'self'`,
-which blocks WebAssembly. We need to relax it slightly:
+The extension also runs under the stock Manifest V3 Content Security Policy
+(essentially `script-src 'self'`), with no relaxation at all. Diagrams that
+need graph layout (**class, component, deployment, state, and use-case
+diagrams**) are laid out by **Smetana**, PlantUML's built-in port of the
+Graphviz layout algorithms, which is compiled into the same `plantuml.js`
+file as the rest of the engine. There is no WebAssembly module and no
+`'wasm-unsafe-eval'` directive in the manifest.
 
-```json
-"content_security_policy": {
-  "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
-}
-```
-
-Why? PlantUML renders sequence diagrams directly to SVG, but anything that
-needs graph layout — **class, component, deployment, state, use-case, and
-activity diagrams** — is laid out by the embedded **Graphviz engine, which
-ships as a WebAssembly module** (`viz-global.js`). Instantiating that module
-requires the `'wasm-unsafe-eval'` CSP source.
-
-`'wasm-unsafe-eval'` is a narrowly scoped directive: despite the scary name,
-it **only** allows WebAssembly compilation and instantiation. It does **not**
-re-enable `eval()` or `new Function()` — those remain blocked. No remote
-scripts can be loaded either; `script-src 'self'` still applies. Google
-documents this directive as the supported way to ship WASM in MV3 extensions.
+This matters beyond the extension itself: GitHub serves its own Mermaid
+renderer under a `script-src 'self'` CSP that blocks WebAssembly, so an
+engine that needs WASM could never be adopted natively. This one runs as a
+single JavaScript file under exactly that policy.
 
 In short: the engine runs entirely inside a sandboxed iframe with an opaque
 origin, with no network access and no shared state with the host page.

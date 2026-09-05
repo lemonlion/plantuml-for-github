@@ -10,10 +10,10 @@ Why Python and not PowerShell's Compress-Archive:
 
 Firefox-specific packaging:
   AMO's addons-linter refuses to parse JS files larger than 5 MB. The
-  TeaVM-compiled plantuml.js weighs ~24 MB and blocks submission. We
-  ship the engine pre-split into 7 chunks (vendor/plantuml.0.js ...
-  vendor/plantuml.6.js, produced by split_plantuml.py), each under
-  4 MB. renderer.html loads them in order as classic scripts.
+  TeaVM-compiled plantuml.js weighs ~14 MB and blocks submission. We
+  ship the engine pre-split into 4 chunks (vendor/plantuml.0.js ...
+  vendor/plantuml.3.js, produced by split_plantuml.py), each under
+  5 MB. renderer.html loads them in order as classic scripts.
   This script lists every shipped file explicitly so the original
   plantuml.js is never accidentally bundled into the Firefox ZIP.
 """
@@ -40,7 +40,7 @@ OUT = ROOT / f"plantuml-for-github-firefox-{version}.zip"
 # Listing every file explicitly guarantees we never accidentally bundle
 # the monolithic vendor/plantuml.js (which would fail AMO's 5 MB linter
 # limit) or leftover artifacts (*.gz, *.filtered.js) from earlier
-# experiments. We ship the 7 chunks plantuml.0.js ... plantuml.6.js
+# experiments. We ship the 4 chunks plantuml.0.js ... plantuml.3.js
 # instead, produced by split_plantuml.py.
 FILES = {
     "manifest.json":         FIREFOX_DIR / "manifest.json",
@@ -54,10 +54,6 @@ FILES = {
     "vendor/plantuml.1.js":  FIREFOX_DIR / "vendor" / "plantuml.1.js",
     "vendor/plantuml.2.js":  FIREFOX_DIR / "vendor" / "plantuml.2.js",
     "vendor/plantuml.3.js":  FIREFOX_DIR / "vendor" / "plantuml.3.js",
-    "vendor/plantuml.4.js":  FIREFOX_DIR / "vendor" / "plantuml.4.js",
-    "vendor/plantuml.5.js":  FIREFOX_DIR / "vendor" / "plantuml.5.js",
-    "vendor/plantuml.6.js":  FIREFOX_DIR / "vendor" / "plantuml.6.js",
-    "vendor/viz-global.js":  FIREFOX_DIR / "vendor" / "viz-global.js",
 }
 
 # Pre-flight check: every declared file must exist.

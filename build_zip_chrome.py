@@ -8,13 +8,13 @@ Why Python and not PowerShell's Compress-Archive:
   lets us set arcname explicitly, so we're safe.
 
 Chrome-specific packaging:
-  Unlike Firefox/AMO, the Chrome Web Store does not impose a 5 MB
-  per-file limit on JS sources, so we ship the original monolithic
-  TeaVM-compiled engine (vendor/plantuml.js, ~24 MB raw / ~7 MB on
-  disk after deflate) as a single file. No chunking is needed and
-  renderer.html loads plantuml.js directly as a classic script.
-  This script enforces that vendor/plantuml.js is present and packs
-  only the files needed for the Chrome build.
+  The Chrome build ships the minified TeaVM-compiled engine
+  (vendor/plantuml.js, ~4 MB on disk) as a single file, imported
+  by renderer.js as an ES module. Graph layout is done by Smetana,
+  PlantUML's built-in port of Graphviz layout, which is compiled
+  into the same file, so there is no separate viz-global.js and no
+  WebAssembly module. This script enforces that vendor/plantuml.js
+  is present and packs only the files needed for the Chrome build.
 """
 
 import json
@@ -45,7 +45,6 @@ FILES = {
     "icons/icon48.png":      CHROME_DIR / "icons" / "icon48.png",
     "icons/icon128.png":     CHROME_DIR / "icons" / "icon128.png",
     "vendor/plantuml.js":    CHROME_DIR / "vendor" / "plantuml.js",
-    "vendor/viz-global.js":  CHROME_DIR / "vendor" / "viz-global.js",
 }
 
 # Pre-flight check: every declared file must exist.

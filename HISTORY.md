@@ -4,6 +4,26 @@ All notable changes to **PlantUML for GitHub** are documented here.
 The project is published as two browser extensions (Chrome and Firefox)
 that share the same version number from `0.2.2` onward.
 
+## 0.3.0
+
+- **The Graphviz WebAssembly module is gone.** Graph layout (class,
+  component, deployment, state, and use-case diagrams) is now done by
+  Smetana, PlantUML's built-in Java port of the Graphviz layout
+  algorithms, which TeaVM compiles into `plantuml.js` along with the
+  rest of the engine. `vendor/viz-global.js` is no longer shipped.
+- The manifest is back to the stock Manifest V3 Content Security
+  Policy: the `'wasm-unsafe-eval'` relaxation is not needed anymore
+  because nothing instantiates WebAssembly.
+- Engine updated from 1.2026.4beta4 to a 1.2026.8beta1 snapshot
+  (plantuml/plantuml commit `0e4f452`), which includes the Smetana
+  browser support and the Smetana performance work from upstream
+  PlantUML. Build commands are documented in FIREFOX.md.
+- The extension is much smaller: the Chrome build ships one 3.9 MB
+  engine file where it previously shipped 8.8 MB across two files.
+- Diagrams that go through graph layout can look slightly different
+  than before: Smetana and Graphviz produce equivalent but not
+  pixel-identical layouts.
+
 ## 0.2.4
 
 - Added a **right-click context menu** on the rendered diagram with
